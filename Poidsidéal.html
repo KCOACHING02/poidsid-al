@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculateur métabolique</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 500px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-weight: bold;
+            margin-top: 10px;
+            color: #555;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            padding: 15px;
+            background-color: #007BFF;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .logo {
+            display: block;
+            margin: 0 auto 20px auto;
+            width: 100px;
+            height: auto;
+        }
+        .hidden {
+            display: none;
+        }
+        .circle-container {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-bottom: 20px;
+            margin-top: 40px;
+        }
+        .circle {
+            background-color: #FFA500;
+            color: #ffffff;
+            border-radius: 50%;
+            width: 100px;
+            height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-weight: bold;
+            font-size: 20px;
+            border: 2px solid #FFD700;
+        }
+        .circle span {
+            font-weight: normal;
+            font-size: 14px;
+        }
+        .image-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        .image-container img {
+            width: 110px;
+            height: auto;
+        }
+        .image-button-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 10px;
+        }
+        .small-button {
+            padding: 5px 10px;
+            background-color: #008080;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 20px;
+            align-self: flex-end;
+        }
+        .buy-button {
+            background-color: #FFD700;
+            color: #000000;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .button-container {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="form-container">
+        <img src="images/Logo.jpg" alt="Logo" class="logo">
+        <h1>Calculateur métabolique</h1>
+        <form id="metabolic-form">
+            <label for="sexe">Sexe :</label>
+            <select id="sexe" name="sexe">
+                <option value="femme">Femme</option>
+                <option value="homme">Homme</option>
+            </select>
+            <label for="age">Âge :</label>
+            <input type="number" id="age" name="age">
+            <label for="taille">Taille (en cm) :</label>
+            <input type="number" id="taille" name="taille">
+            <button type="button" onclick="calculateIdealWeight()">Calculer le poids idéal</button>
+        </form>
+    </div>
+    <div class="container hidden" id="result-container">
+        <h1>Poids Idéal</h1>
+        <div class="circle-container">
+            <div class="circle" id="ideal-weight"><strong></strong><span>Poids Idéal</span></div>
+        </div>
+        <div style="display: flex; justify-content: flex-end;">
+            <button class="small-button" onclick="returnToForm()">Retourner au formulaire</button>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="https://cdn.emailjs.com/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function() {
+            emailjs.init("service_sqyzz46"); // Utilisez votre user ID EmailJS
+        })();
+
+        function calculateIdealWeight() {
+            // Récupérer les valeurs du formulaire
+            const sexe = document.getElementById('sexe').value;
+            const taille = document.getElementById('taille').value;
+
+            // Calculer le poids idéal selon la formule de Lorentz
+            let poidsIdeal;
+            if (sexe === 'homme') {
+                poidsIdeal = taille - 100 - ((taille - 150) / 4);
+            } else {
+                poidsIdeal = taille - 100 - ((taille - 150) / 2.5);
+            }
+
+            // Afficher le poids idéal
+            document.getElementById('ideal-weight').querySelector('strong').innerText = poidsIdeal.toFixed(1) + ' kg';
+
+            // Masquer le formulaire et afficher le résultat
+            document.getElementById('form-container').classList.add('hidden');
+            document.getElementById('result-container').classList.remove('hidden');
+
+            // Envoyer les résultats par email
+            const formData = {
+                user_sexe: sexe,
+                user_taille: taille,
+                user_poidsIdeal: poidsIdeal.toFixed(1)
+            };
+
+            emailjs.send('service_sqyzz46', 'template_pqljgzj', formData)
+                .then(function(response) {
+                    console.log('SUCCESS!', response.status, response.text);
+                }, function(error) {
+                    console.log('FAILED...', error);
+                });
+        }
+
+        function returnToForm() {
+            // Masquer le résultat et afficher le formulaire
+            document.getElementById('result-container').classList.add('hidden');
+            document.getElementById('form-container').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
